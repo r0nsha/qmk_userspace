@@ -18,20 +18,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "color.h"
 #include "keycodes.h"
 #include "rgblight/rgblight.h"
 #include "quantum_keycodes.h"
 #include QMK_KEYBOARD_H
 
-// TODO: base: blue
 // TODO: layer: colemak
 // TODO: layer: ext
 // TODO: layer: sym
 // TODO: layer: num
 // TODO: layer: fun
+// TODO: Move QK_BOOT, QK_RBT and EE_CLR to fun layer
 // TODO: layer: gaming
 // TODO: precondition
 // TODO: lang switch button using custom functionality
+// TODO: rgb lights per layer
 // TODO: discord: show off!
 // TODO: discord: ask about case
 
@@ -49,10 +51,10 @@ enum layers {
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [QWERTY] = LAYOUT_split_3x6_3(
-        KC_NO, KC_Q,         KC_W,         KC_E,         KC_R,         KC_T,   KC_Y,   KC_U,         KC_I,         KC_O,         KC_P,             KC_NO,
-        KC_NO, LGUI_T(KC_A), LALT_T(KC_S), LCTL_T(KC_D), LSFT_T(KC_F), KC_G,   KC_H,   RSFT_T(KC_J), RCTL_T(KC_K), LALT_T(KC_L), RGUI_T(KC_QUOTE), KC_NO,
-        KC_NO, KC_Z,         KC_X,         KC_C,         KC_V,         KC_B,   KC_N,   KC_M,         KC_COMM,      KC_DOT,       KC_SLSH,          KC_NO,
-                                           KC_ESC,       KC_SPC,       KC_TAB, KC_ENT, KC_BSPC,      KC_TAB
+        UG_TOGG, KC_Q,         KC_W,         KC_E,         KC_R,         KC_T,   KC_Y,   KC_U,         KC_I,         KC_O,         KC_P,             QK_BOOT,
+        UG_NEXT, LGUI_T(KC_A), LALT_T(KC_S), LCTL_T(KC_D), LSFT_T(KC_F), KC_G,   KC_H,   RSFT_T(KC_J), RCTL_T(KC_K), LALT_T(KC_L), RGUI_T(KC_QUOTE), QK_RBT,
+        UG_PREV, KC_Z,         KC_X,         KC_C,         KC_V,         KC_B,   KC_N,   KC_M,         KC_COMM,      KC_DOT,       KC_SLSH,          EE_CLR,
+                                             KC_ESC,       KC_SPC,       KC_TAB, KC_ENT, KC_BSPC,      KC_TAB
     ),
 };
 
@@ -95,16 +97,16 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
     return true;
 }
 
-layer_state_t layer_state_set_user(layer_state_t state) {
-    switch (get_highest_layer(state)) {
-        case QWERTY:
-        default:
-            rgblight_setrgb(RGB_WHITE);
-            break;
-    }
+/* layer_state_t layer_state_set_user(layer_state_t state) { */
+/*     switch (get_highest_layer(state)) { */
+/*         case QWERTY: */
+/*         default: */
+/*             rgblight_setrgb(RGB_WHITE); */
+/*             break; */
+/*     } */
 
-    return state;
-}
+/*     return state; */
+/* } */
 
 #ifdef ENCODER_MAP_ENABLE
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
