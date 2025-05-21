@@ -2,7 +2,7 @@ flash:
     cd ~/dev/qmk_firmware && \
         qmk flash \
             -kb crkbd/rev1 \
-            -km default \
+            -km r0nsha \
             -e USER_NAME=holykeebs \
             -e OLED=stock \
             -j20
