@@ -31,7 +31,12 @@ enum layers {
     GAMING,
 };
 
+enum custom_keycodes {
+    BSPC_DEL = SAFE_RANGE,
+};
+
 // TODO: home row mods
+// TODO: base: blue
 // TODO: layer: colemak
 // TODO: layer: ext
 // TODO: layer: sym
@@ -52,7 +57,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
         KC_NO,    KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                         KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH,   KC_NO,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                           KC_ESC,  KC_SPC,  KC_TAB,     KC_ENT, KC_BSPC,  KC_TAB
+                                           KC_ESC,  KC_SPC,  KC_TAB,     KC_ENT,BSPC_DEL,  KC_TAB
                                       //`--------------------------'  `--------------------------'
 
   ),
@@ -69,6 +74,35 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                       //`--------------------------'  `--------------------------'
   ),
 };
+
+bool process_record_keymap(uint16_t keycode, keyrecord_t *record){
+  static uint8_t saved_mods   = 0;
+
+  switch (keycode){
+    case BSPC_DEL:
+        if (record->event.pressed) {
+            saved_mods = get_mods() & MOD_MASK_SHIFT;
+
+            if (saved_mods == MOD_MASK_SHIFT) {  // Both shifts pressed
+                register_code(KC_DEL);
+            } else if (saved_mods) {   // One shift pressed
+                del_mods(saved_mods);  // Remove any Shifts present
+                register_code(KC_DEL);
+                add_mods(saved_mods);  // Add shifts again
+            } else {
+                register_code(KC_BSPC);
+            }
+        } else {
+            unregister_code(KC_DEL);
+            unregister_code(KC_BSPC);
+        }
+        return false;
+    default:
+        break;
+  }
+
+  return true;
+}
 
 #ifdef ENCODER_MAP_ENABLE
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
