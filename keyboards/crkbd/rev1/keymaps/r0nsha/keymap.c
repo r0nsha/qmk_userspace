@@ -20,9 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdbool.h>
 #include "action_layer.h"
 #include "color.h"
+#include "keycode_string.h"
 #include "keycodes.h"
 #include "quantum_keycodes.h"
 #include "rgb_matrix.h"
+#include "caps_word.h"
 #include QMK_KEYBOARD_H
 
 // TODO: layer: colemak
@@ -48,7 +50,23 @@ enum layers {
     GAMING,
 };
 
-/* enum custom_keycodes {}; */
+static const hsv_t layer_colors[] = {
+    [QWERTY]  = {HSV_WHITE},
+    [COLEMAK] = {HSV_BLUE},
+    [GAMING]  = {HSV_RED},
+};
+
+static const char* layer_names[] = {
+    [QWERTY]  = "QWERTY",
+    [COLEMAK] = "COLEMAK",
+    [GAMING]  = "GAMING",
+};
+
+enum custom_keycodes {
+    KC_LANG = SAFE_RANGE,
+};
+
+KEYCODE_STRING_NAMES_USER(KEYCODE_STRING_NAME(KC_LANG));
 
 enum tap_dances {
     TD_GAMING,
@@ -83,7 +101,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 };
 
+static const char* last_key_str = "None";
+
 bool process_record_user(uint16_t keycode, keyrecord_t* record) {
+    if (record->event.pressed) {
+        last_key_str = get_keycode_string(keycode);
+    }
+
     switch (keycode) {
         case KC_BSPC: {
             static uint16_t registered_key = KC_NO;
@@ -130,12 +154,6 @@ layer_state_t default_layer_set_user(layer_state_t state) {
     return layer_state_set_user(state);
 }
 
-static const hsv_t layer_colors[] = {
-    [QWERTY]  = {HSV_ORANGE},
-    [COLEMAK] = {HSV_MAGENTA},
-    [GAMING]  = {HSV_RED},
-};
-
 layer_state_t layer_state_set_user(layer_state_t state) {
     uint8_t layer = get_highest_layer(state);
 
@@ -147,6 +165,37 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     rgb_matrix_sethsv(hsv.h, hsv.s, hsv.v);
     return state;
 }
+
+#ifdef OLED_ENABLE
+bool oled_task_user(void) {
+    uint8_t layer = get_highest_layer(layer_state);
+
+    // current layer
+    oled_write_P(PSTR("Layer: "), false);
+
+    const char* layer_name = "Unknown";
+    if (layer < sizeof(layer_names) / sizeof(layer_names[0])) {
+        layer_name = layer_names[layer];
+    }
+
+    oled_write_ln_P(PSTR(layer_name), false);
+
+    // last key press
+    oled_write_P(PSTR("Key: "), false);
+    oled_write_ln_P(PSTR(last_key_str), false);
+
+    // states
+    uint8_t mod_state = get_mods();
+    oled_write(is_caps_word_on() ? "CAPW " : "      ", false);
+    oled_write((mod_state & MOD_MASK_SHIFT) ? "SHIFT " : "      ", false);
+    oled_write((mod_state & MOD_MASK_CTRL) ? "CTRL " : "     ", false);
+    oled_write((mod_state & MOD_MASK_ALT) ? "ALT " : "    ", false);
+    oled_write((mod_state & MOD_MASK_GUI) ? "GUI" : "   ", false);
+    oled_write("\n", false);
+
+    return false;
+}
+#endif
 
 #ifdef ENCODER_MAP_ENABLE
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {

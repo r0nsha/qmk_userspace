@@ -12,3 +12,6 @@ install:
     mkdir -p ~/dev
     qmk setup --home ~/dev/qmk_firmware -b hk-master holykeebs/qmk_firmware
     make clean; bear -- qmk compile -kb crkbd/rev1 -km r0nsha
+
+bear:
+    make clean; bear -- qmk compile -kb crkbd/rev1 -km r0nsha
