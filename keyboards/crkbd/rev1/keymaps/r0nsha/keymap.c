@@ -16,7 +16,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// clang-format off
 #include <stdint.h>
 #include <stdbool.h>
 #include QMK_KEYBOARD_H
@@ -50,65 +49,72 @@ enum custom_keycodes {
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [QWERTY] = LAYOUT_split_3x6_3(
-  //,-----------------------------------------------------.                    ,-----------------------------------------------------.
-        KC_NO,    KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                         KC_Y,    KC_U,    KC_I,    KC_O,   KC_P,    KC_NO,
-  //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-        KC_NO,    KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                         KC_H,    KC_J,    KC_K,    KC_L,KC_QUOTE,   KC_NO,
-  //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-        KC_NO,    KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                         KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH,   KC_NO,
-  //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                           KC_ESC,  KC_SPC,  KC_TAB,     KC_ENT,BSPC_DEL,  KC_TAB
-                                      //`--------------------------'  `--------------------------'
-
-  ),
-
-    [COLEMAK] = LAYOUT_split_3x6_3(
-  //,-----------------------------------------------------.                    ,-----------------------------------------------------.
-       KC_TAB,    KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                         KC_6,    KC_7,    KC_8,    KC_9,    KC_0, KC_BSPC,
-  //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      KC_LCTL, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      KC_LEFT, KC_DOWN,   KC_UP,KC_RIGHT, XXXXXXX, XXXXXXX,
-  //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      KC_LSFT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-  //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          KC_LGUI, _______,  KC_SPC,     KC_ENT,   MO(3), KC_RALT
-                                      //`--------------------------'  `--------------------------'
-  ),
+        KC_NO, KC_Q,         KC_W, KC_E,   KC_R,   KC_T,   KC_Y,   KC_U,     KC_I,    KC_O,   KC_P,     KC_NO,
+        KC_NO, LGUI_T(KC_A), KC_S, KC_D,   KC_F,   KC_G,   KC_H,   KC_J,     KC_K,    KC_L,   KC_QUOTE, KC_NO,
+        KC_NO, KC_Z,         KC_X, KC_C,   KC_V,   KC_B,   KC_N,   KC_M,     KC_COMM, KC_DOT, KC_SLSH,  KC_NO,
+                                   KC_ESC, KC_SPC, KC_TAB, KC_ENT, BSPC_DEL, KC_TAB
+    ),
 };
 
-bool process_record_keymap(uint16_t keycode, keyrecord_t *record){
-  static uint8_t saved_mods   = 0;
+bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
+    static uint8_t saved_mods = 0;
 
-  switch (keycode){
-    case BSPC_DEL:
-        if (record->event.pressed) {
-            saved_mods = get_mods() & MOD_MASK_SHIFT;
+    switch (keycode) {
+        case BSPC_DEL:
+            if (record->event.pressed) {
+                saved_mods = get_mods() & MOD_MASK_SHIFT;
 
-            if (saved_mods == MOD_MASK_SHIFT) {  // Both shifts pressed
-                register_code(KC_DEL);
-            } else if (saved_mods) {   // One shift pressed
-                del_mods(saved_mods);  // Remove any Shifts present
-                register_code(KC_DEL);
-                add_mods(saved_mods);  // Add shifts again
+                if (saved_mods == MOD_MASK_SHIFT) { // Both shifts pressed
+                    register_code(KC_DEL);
+                } else if (saved_mods) {  // One shift pressed
+                    del_mods(saved_mods); // Remove any Shifts present
+                    register_code(KC_DEL);
+                    add_mods(saved_mods); // Add shifts again
+                } else {
+                    register_code(KC_BSPC);
+                }
             } else {
-                register_code(KC_BSPC);
+                unregister_code(KC_DEL);
+                unregister_code(KC_BSPC);
             }
-        } else {
-            unregister_code(KC_DEL);
-            unregister_code(KC_BSPC);
-        }
-        return false;
-    default:
-        break;
-  }
+            return false;
+        default:
+            break;
+    }
 
-  return true;
+    return true;
 }
 
 #ifdef ENCODER_MAP_ENABLE
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
-  [0] = { ENCODER_CCW_CW(KC_VOLD, KC_VOLU), ENCODER_CCW_CW(KC_MPRV, KC_MNXT), ENCODER_CCW_CW(RM_VALD, RM_VALU), ENCODER_CCW_CW(KC_RGHT, KC_LEFT), },
-  [1] = { ENCODER_CCW_CW(KC_VOLD, KC_VOLU), ENCODER_CCW_CW(KC_MPRV, KC_MNXT), ENCODER_CCW_CW(RM_VALD, RM_VALU), ENCODER_CCW_CW(KC_RGHT, KC_LEFT), },
-  [2] = { ENCODER_CCW_CW(KC_VOLD, KC_VOLU), ENCODER_CCW_CW(KC_MPRV, KC_MNXT), ENCODER_CCW_CW(RM_VALD, RM_VALU), ENCODER_CCW_CW(KC_RGHT, KC_LEFT), },
-  [3] = { ENCODER_CCW_CW(KC_VOLD, KC_VOLU), ENCODER_CCW_CW(KC_MPRV, KC_MNXT), ENCODER_CCW_CW(RM_VALD, RM_VALU), ENCODER_CCW_CW(KC_RGHT, KC_LEFT), },
+    [0] =
+        {
+            ENCODER_CCW_CW(KC_VOLD, KC_VOLU),
+            ENCODER_CCW_CW(KC_MPRV, KC_MNXT),
+            ENCODER_CCW_CW(RM_VALD, RM_VALU),
+            ENCODER_CCW_CW(KC_RGHT, KC_LEFT),
+        },
+    [1] =
+        {
+            ENCODER_CCW_CW(KC_VOLD, KC_VOLU),
+            ENCODER_CCW_CW(KC_MPRV, KC_MNXT),
+            ENCODER_CCW_CW(RM_VALD, RM_VALU),
+            ENCODER_CCW_CW(KC_RGHT, KC_LEFT),
+        },
+    [2] =
+        {
+            ENCODER_CCW_CW(KC_VOLD, KC_VOLU),
+            ENCODER_CCW_CW(KC_MPRV, KC_MNXT),
+            ENCODER_CCW_CW(RM_VALD, RM_VALU),
+            ENCODER_CCW_CW(KC_RGHT, KC_LEFT),
+        },
+    [3] =
+        {
+            ENCODER_CCW_CW(KC_VOLD, KC_VOLU),
+            ENCODER_CCW_CW(KC_MPRV, KC_MNXT),
+            ENCODER_CCW_CW(RM_VALD, RM_VALU),
+            ENCODER_CCW_CW(KC_RGHT, KC_LEFT),
+        },
 };
 #endif
+
