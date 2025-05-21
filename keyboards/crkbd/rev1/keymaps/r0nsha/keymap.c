@@ -18,24 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "keycodes.h"
 #include "quantum_keycodes.h"
 #include QMK_KEYBOARD_H
 
-enum layers {
-    QWERTY,
-    COLEMAK,
-    EXT,
-    SYM,
-    NUM,
-    FUN,
-    GAMING,
-};
-
-enum custom_keycodes {
-    BSPC_DEL = SAFE_RANGE,
-};
-
-// TODO: home row mods
 // TODO: base: blue
 // TODO: layer: colemak
 // TODO: layer: ext
@@ -48,39 +34,61 @@ enum custom_keycodes {
 // TODO: discord: show off!
 // TODO: discord: ask about case
 
+enum layers {
+    QWERTY,
+    COLEMAK,
+    EXT,
+    SYM,
+    NUM,
+    FUN,
+    GAMING,
+};
+
+/* enum custom_keycodes {}; */
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [QWERTY] = LAYOUT_split_3x6_3(
         KC_NO, KC_Q,         KC_W,         KC_E,         KC_R,         KC_T,   KC_Y,   KC_U,         KC_I,         KC_O,         KC_P,             KC_NO,
         KC_NO, LGUI_T(KC_A), LALT_T(KC_S), LCTL_T(KC_D), LSFT_T(KC_F), KC_G,   KC_H,   RSFT_T(KC_J), RCTL_T(KC_K), LALT_T(KC_L), RGUI_T(KC_QUOTE), KC_NO,
         KC_NO, KC_Z,         KC_X,         KC_C,         KC_V,         KC_B,   KC_N,   KC_M,         KC_COMM,      KC_DOT,       KC_SLSH,          KC_NO,
-                                           KC_ESC,       KC_SPC,       KC_TAB, KC_ENT, BSPC_DEL,     KC_TAB
+                                           KC_ESC,       KC_SPC,       KC_TAB, KC_ENT, KC_BSPC,      KC_TAB
     ),
 };
 
-bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
-    static uint8_t saved_mods = 0;
-
+bool process_record_user(uint16_t keycode, keyrecord_t* record) {
     switch (keycode) {
-        case BSPC_DEL:
-            if (record->event.pressed) {
-                saved_mods = get_mods() & MOD_MASK_SHIFT;
-
-                if (saved_mods == MOD_MASK_SHIFT) { // Both shifts pressed
-                    register_code(KC_DEL);
-                } else if (saved_mods) {  // One shift pressed
-                    del_mods(saved_mods); // Remove any Shifts present
-                    register_code(KC_DEL);
-                    add_mods(saved_mods); // Add shifts again
+        case KC_BSPC: {
+            static uint16_t registered_key = KC_NO;
+            if (record->event.pressed) { // On key press.
+                const uint8_t mods = get_mods();
+#ifndef NO_ACTION_ONESHOT
+                uint8_t shift_mods = (mods | get_oneshot_mods()) & MOD_MASK_SHIFT;
+#else
+                uint8_t shift_mods = mods & MOD_MASK_SHIFT;
+#endif                            // NO_ACTION_ONESHOT
+                if (shift_mods) { // At least one shift key is held.
+                    registered_key = KC_DEL;
+                    // If one shift is held, clear it from the mods. But if both
+                    // shifts are held, leave as is to send Shift + Del.
+                    if (shift_mods != MOD_MASK_SHIFT) {
+#ifndef NO_ACTION_ONESHOT
+                        del_oneshot_mods(MOD_MASK_SHIFT);
+#endif // NO_ACTION_ONESHOT
+                        unregister_mods(MOD_MASK_SHIFT);
+                    }
                 } else {
-                    register_code(KC_BSPC);
+                    registered_key = KC_BSPC;
                 }
-            } else {
-                unregister_code(KC_DEL);
-                unregister_code(KC_BSPC);
+
+                register_code(registered_key);
+                set_mods(mods);
+            } else { // On key release.
+                unregister_code(registered_key);
             }
+        }
             return false;
-        default:
-            break;
+
+            // Other macros...
     }
 
     return true;
