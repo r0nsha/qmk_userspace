@@ -16,22 +16,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
+
 #include "action_layer.h"
+#include "caps_word.h"
 #include "color.h"
 #include "keyboard.h"
 #include "keycode_string.h"
 #include "keycodes.h"
+#include "keymap_us.h"
 #include "quantum.h"
 #include "quantum_keycodes.h"
 #include "rgb_matrix.h"
-#include "caps_word.h"
 #include QMK_KEYBOARD_H
 
-// TODO: layer: sym
-// TODO: layer: num
-// TODO: layer: gaming
 // TODO: precondition
 // TODO: lang switch button using custom functionality
 // TODO: rgb lights per layer
@@ -42,30 +41,18 @@ enum layers {
     QWERTY,
     COLEMAK,
     EXT,
-    /* SYM, */
-    /* NUM, */
+    SYM,
+    NUM,
     FUN,
     GAMING,
 };
 
 static const hsv_t layer_colors[] = {
-    [QWERTY]  = {HSV_TEAL},
-    [COLEMAK] = {HSV_PINK},
-    [EXT]     = {HSV_CORAL},
-    /* [SYM]     = {HSV_SPRINGGREEN}, */
-    /* [NUM]     = {HSV_ORANGE}, */
-    [FUN]    = {HSV_PURPLE},
-    [GAMING] = {HSV_RED},
+    [QWERTY] = {HSV_SPRINGGREEN}, [COLEMAK] = {HSV_PINK}, [EXT] = {HSV_YELLOW}, [SYM] = {HSV_ORANGE}, [NUM] = {HSV_BLUE}, [FUN] = {HSV_PURPLE}, [GAMING] = {HSV_RED},
 };
 
 static const char* layer_names[] = {
-    [QWERTY]  = "QWERTY",
-    [COLEMAK] = "COLEMAK",
-    [EXT]     = "EXT",
-    /* [SYM]     = "SYM", */
-    /* [NUM]     = "NUM", */
-    [FUN]    = "FUN",
-    [GAMING] = "GAMING",
+    [QWERTY] = "QWERTY", [COLEMAK] = "COLEMAK", [EXT] = "EXT", [SYM] = "SYM", [NUM] = "NUM", [FUN] = "FUN", [GAMING] = "GAMING",
 };
 
 enum custom_keycodes {
@@ -86,10 +73,10 @@ tap_dance_action_t tap_dance_actions[] = {
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [QWERTY] = LAYOUT_split_3x6_3(
-        XXXXXXX,        KC_Q,         KC_W,         KC_E,         KC_R,         KC_T,   KC_Y,            KC_U,         KC_I,         KC_O,         KC_P,             XXXXXXX,
-        XXXXXXX,        LGUI_T(KC_A), LALT_T(KC_S), LCTL_T(KC_D), LSFT_T(KC_F), KC_G,   KC_H,            RSFT_T(KC_J), RCTL_T(KC_K), LALT_T(KC_L), RGUI_T(KC_QUOTE), XXXXXXX,
-        TD(TD_COLEMAK), KC_Z,         KC_X,         KC_C,         KC_V,         KC_B,   KC_N,            KC_M,         KC_COMM,      KC_DOT,       KC_SLSH,          TD(TD_GAMING),
-                                                    KC_ESC,       KC_SPC,       KC_TAB, LT(EXT, KC_ENT), KC_BSPC,      MO(FUN)
+        XXXXXXX,        KC_Q,         KC_W,         KC_E,            KC_R,         KC_T,            KC_Y,            KC_U,         KC_I,         KC_O,         KC_P,             XXXXXXX,
+        XXXXXXX,        LGUI_T(KC_A), LALT_T(KC_S), LCTL_T(KC_D),    LSFT_T(KC_F), KC_G,            KC_H,            RSFT_T(KC_J), RCTL_T(KC_K), LALT_T(KC_L), RGUI_T(KC_QUOTE), XXXXXXX,
+        TD(TD_COLEMAK), KC_Z,         KC_X,         KC_C,            KC_V,         KC_B,            KC_N,            KC_M,         KC_COMM,      KC_DOT,       KC_SLSH,          TD(TD_GAMING),
+                                                    LT(NUM, KC_ESC), KC_SPC,       LT(EXT, KC_TAB), LT(SYM, KC_ENT), KC_BSPC,      MO(FUN)
     ),
 
     [COLEMAK] = LAYOUT_split_3x6_3(
@@ -100,16 +87,30 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 
     [EXT] = LAYOUT_split_3x6_3(
-        XXXXXXX, XXXXXXX,       XXXXXXX,       XXXXXXX,       XXXXXXX,       XXXXXXX, KC_HOME, KC_PGDN, KC_PGUP, KC_END,  KC_ESC, XXXXXXX,
-        XXXXXXX, LGUI(XXXXXXX), LALT(XXXXXXX), LCTL(XXXXXXX), LSFT(XXXXXXX), XXXXXXX, KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, KC_ENT, XXXXXXX,
-        XXXXXXX, XXXXXXX,       XXXXXXX,       XXXXXXX,       CW_TOGG,       KC_LANG, XXXXXXX, KC_DEL,  KC_INS,  XXXXXXX, KC_TAB, XXXXXXX,
+        _______, XXXXXXX,       XXXXXXX,       XXXXXXX,       XXXXXXX,       XXXXXXX, KC_HOME, KC_PGDN, KC_PGUP, KC_END,  KC_ESC, _______,
+        _______, LGUI(XXXXXXX), LALT(XXXXXXX), LCTL(XXXXXXX), LSFT(XXXXXXX), XXXXXXX, KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, KC_ENT, _______,
+        _______, XXXXXXX,       XXXXXXX,       XXXXXXX,       CW_TOGG,       KC_LANG, XXXXXXX, KC_DEL,  KC_INS,  XXXXXXX, KC_TAB, _______,
                                                _______,       _______,       _______, _______, _______, _______
     ),
 
+    [SYM] = LAYOUT_split_3x6_3(
+        _______, KC_AT,   KC_LABK, KC_RABK, KC_PERC, KC_BSLS, KC_CIRC, KC_AMPR, KC_LBRC, KC_RBRC, KC_HASH, _______,
+        _______, KC_EXLM, KC_MINS, KC_SLSH, KC_EQL,  KC_PIPE, KC_SCLN, KC_COLN, KC_LPRN, KC_RPRN, KC_DQUO, _______,
+        _______, KC_TILD, KC_PLUS, KC_ASTR, KC_UNDS, KC_BSLS, KC_GRV,  KC_DLR,  KC_LCBR, KC_RCBR, KC_QUES, _______,
+                                   _______, _______, _______, _______, _______, _______
+    ),
+
+    [NUM] = LAYOUT_split_3x6_3(
+        _______, XXXXXXX,       XXXXXXX,       XXXXXXX,       XXXXXXX,       KC_ASTR, KC_7,    KC_8,    KC_9, KC_PLUS, XXXXXXX, _______,
+        _______, LGUI(XXXXXXX), LALT(XXXXXXX), LCTL(XXXXXXX), LSFT(XXXXXXX), KC_SLSH, KC_4,    KC_5,    KC_6, KC_MINS, KC_EQL,  _______,
+        _______, XXXXXXX,       XXXXXXX,       XXXXXXX,       XXXXXXX,       XXXXXXX, KC_1,    KC_2,    KC_3, KC_DOT,  XXXXXXX, _______,
+                                               _______,       _______,       _______, _______, _______, KC_0
+    ),
+
     [FUN] = LAYOUT_split_3x6_3(
-        RM_TOGG, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_F12,  KC_F7,   KC_F8,  KC_F9, XXXXXXX, QK_BOOT,
-        RM_NEXT, KC_MSTP, KC_MPRV, KC_MPLY, KC_MNXT, KC_BRIU, KC_F11,  KC_F4,   KC_F5,  KC_F6, XXXXXXX, QK_RBT,
-        RM_PREV, KC_PSCR, KC_VOLD, KC_MUTE, KC_VOLU, KC_BRID, KC_F10,  KC_F1,   KC_F2,  KC_F3, XXXXXXX, EE_CLR,
+        RM_TOGG, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_F12,  KC_F7,  KC_F8, KC_F9, QK_BOOT,
+        RM_NEXT, KC_MSTP, KC_MPRV, KC_MPLY, KC_MNXT, KC_BRIU, XXXXXXX, KC_F11,  KC_F4,  KC_F5, KC_F6, QK_RBT,
+        RM_PREV, KC_PSCR, KC_VOLD, KC_MUTE, KC_VOLU, KC_BRID, XXXXXXX, KC_F10,  KC_F1,  KC_F2, KC_F3, EE_CLR,
                                    _______, _______, _______, _______, _______, _______
     ),
 
@@ -123,7 +124,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 static const char* last_key_str = "None";
 
-bool process_record_user(uint16_t keycode, keyrecord_t* record) {
+bool               process_record_user(uint16_t keycode, keyrecord_t* record) {
     if (record->event.pressed) {
         last_key_str = get_keycode_string(keycode);
     }
@@ -179,7 +180,7 @@ layer_state_t default_layer_set_user(layer_state_t state) {
 layer_state_t layer_state_set_user(layer_state_t state) {
     uint8_t layer = get_highest_layer(state);
 
-    hsv_t hsv = layer_colors[QWERTY];
+    hsv_t   hsv   = layer_colors[QWERTY];
     if (layer < sizeof(layer_colors) / sizeof(layer_colors[0])) {
         hsv = layer_colors[layer];
     }

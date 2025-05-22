@@ -74,10 +74,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #    define ENABLE_RGB_MATRIX_STARLIGHT_DUAL_HUE
 #    define ENABLE_RGB_MATRIX_STARLIGHT_DUAL_SAT
 #    define ENABLE_RGB_MATRIX_RIVERFLOW
-#    define RGB_MATRIX_MAXIMUM_BRIGHTNESS 120
 #    define RGB_MATRIX_DEFAULT_MODE RGB_MATRIX_RIVERFLOW
-// #    define RGB_MATRIX_DEFAULT_SPD 32
-// #    define RGB_MATRIX_DEFAULT_VAL 64
+#    define RGB_MATRIX_MAXIMUM_BRIGHTNESS 120
+#    define RGB_MATRIX_DEFAULT_SPD 32
+#    define RGB_MATRIX_DEFAULT_VAL 64
 #    define RGB_MATRIX_SLEEP
 #endif
 
