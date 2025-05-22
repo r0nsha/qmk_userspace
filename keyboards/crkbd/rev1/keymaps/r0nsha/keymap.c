@@ -43,7 +43,7 @@ enum layers {
 };
 
 static const hsv_t layer_colors[] = {
-    [QWERTY] = {HSV_SPRINGGREEN}, [COLEMAK] = {HSV_MAGENTA}, [EXT] = {HSV_GOLD}, [SYM] = {HSV_SPRINGGREEN}, [NUM] = {HSV_BLUE}, [FUN] = {HSV_PURPLE}, [GAMING] = {HSV_RED},
+    [QWERTY] = {HSV_SPRINGGREEN}, [COLEMAK] = {HSV_MAGENTA}, [EXT] = {HSV_PINK}, [SYM] = {HSV_ORANGE}, [NUM] = {HSV_BLUE}, [FUN] = {HSV_PURPLE}, [GAMING] = {HSV_RED},
 };
 
 static const char* layer_names[] = {

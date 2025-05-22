@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #    define MASTER_RIGHT
 #endif
 
-#define QUICK_TAP_TERM 0
+#define QUICK_TAP_TERM 100
 #define TAPPING_TERM 200
 #define TAPPING_TOGGLE 2
 #define PERMISSIVE_HOLD
