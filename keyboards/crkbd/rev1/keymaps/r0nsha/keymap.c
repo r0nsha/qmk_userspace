@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "action.h"
 #include "action_layer.h"
 #include "caps_word.h"
 #include "color.h"
@@ -32,10 +33,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include QMK_KEYBOARD_H
 
 // TODO: precondition
-// TODO: lang switch button using custom functionality
-// TODO: rgb lights per layer
-// TODO: discord: show off!
-// TODO: discord: ask about case
 
 enum layers {
     QWERTY,
@@ -73,10 +70,10 @@ tap_dance_action_t tap_dance_actions[] = {
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [QWERTY] = LAYOUT_split_3x6_3(
-        XXXXXXX,        KC_Q,         KC_W,         KC_E,            KC_R,         KC_T,            KC_Y,            KC_U,         KC_I,         KC_O,         KC_P,             XXXXXXX,
-        XXXXXXX,        LGUI_T(KC_A), LALT_T(KC_S), LCTL_T(KC_D),    LSFT_T(KC_F), KC_G,            KC_H,            RSFT_T(KC_J), RCTL_T(KC_K), LALT_T(KC_L), RGUI_T(KC_QUOTE), XXXXXXX,
-        TD(TD_COLEMAK), KC_Z,         KC_X,         KC_C,            KC_V,         KC_B,            KC_N,            KC_M,         KC_COMM,      KC_DOT,       KC_SLSH,          TD(TD_GAMING),
-                                                    LT(NUM, KC_ESC), KC_SPC,       LT(EXT, KC_TAB), LT(SYM, KC_ENT), KC_BSPC,      MO(FUN)
+        XXXXXXX,        KC_Q,         KC_W,         KC_E,            KC_R,            KC_T,   KC_Y,   KC_U,             KC_I,         KC_O,         KC_P,             XXXXXXX,
+        XXXXXXX,        LGUI_T(KC_A), LALT_T(KC_S), LCTL_T(KC_D),    LSFT_T(KC_F),    KC_G,   KC_H,   RSFT_T(KC_J),     RCTL_T(KC_K), LALT_T(KC_L), RGUI_T(KC_QUOTE), XXXXXXX,
+        TD(TD_COLEMAK), KC_Z,         KC_X,         KC_C,            KC_V,            KC_B,   KC_N,   KC_M,             KC_COMM,      KC_DOT,       KC_SLSH,          TD(TD_GAMING),
+                                                    LT(NUM, KC_ESC), LT(EXT, KC_SPC), KC_TAB, KC_ENT, LT(SYM, KC_BSPC), MO(FUN)
     ),
 
     [COLEMAK] = LAYOUT_split_3x6_3(
@@ -89,7 +86,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [EXT] = LAYOUT_split_3x6_3(
         _______, XXXXXXX,       XXXXXXX,       XXXXXXX,       XXXXXXX,       XXXXXXX, KC_HOME, KC_PGDN, KC_PGUP, KC_END,  KC_ESC, _______,
         _______, LGUI(XXXXXXX), LALT(XXXXXXX), LCTL(XXXXXXX), LSFT(XXXXXXX), XXXXXXX, KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, KC_ENT, _______,
-        _______, XXXXXXX,       XXXXXXX,       XXXXXXX,       CW_TOGG,       KC_LANG, XXXXXXX, KC_DEL,  KC_INS,  XXXXXXX, KC_TAB, _______,
+        _______, XXXXXXX,       XXXXXXX,       XXXXXXX,       XXXXXXX,       XXXXXXX, KC_LANG, CW_TOGG, KC_DEL,  KC_INS,  KC_TAB, _______,
                                                _______,       _______,       _______, _______, _______, _______
     ),
 
@@ -101,9 +98,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 
     [NUM] = LAYOUT_split_3x6_3(
-        _______, XXXXXXX,       XXXXXXX,       XXXXXXX,       XXXXXXX,       KC_ASTR, KC_7,    KC_8,    KC_9, KC_PLUS, XXXXXXX, _______,
-        _______, LGUI(XXXXXXX), LALT(XXXXXXX), LCTL(XXXXXXX), LSFT(XXXXXXX), KC_SLSH, KC_4,    KC_5,    KC_6, KC_MINS, KC_EQL,  _______,
-        _______, XXXXXXX,       XXXXXXX,       XXXXXXX,       XXXXXXX,       XXXXXXX, KC_1,    KC_2,    KC_3, KC_DOT,  XXXXXXX, _______,
+        _______, XXXXXXX,       XXXXXXX,       XXXXXXX,       XXXXXXX,       XXXXXXX, KC_ASTR, KC_7,    KC_8, KC_9, KC_PLUS, _______,
+        _______, LGUI(XXXXXXX), LALT(XXXXXXX), LCTL(XXXXXXX), LSFT(XXXXXXX), KC_EQL,  KC_SLSH, KC_4,    KC_5, KC_6, KC_MINS, _______,
+        _______, XXXXXXX,       XXXXXXX,       XXXXXXX,       XXXXXXX,       XXXXXXX, XXXXXXX, KC_1,    KC_2, KC_3, KC_DOT,  _______,
                                                _______,       _______,       _______, _______, _______, KC_0
     ),
 
@@ -123,6 +120,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 static const char* last_key_str = "None";
+bool               is_qwerty    = true;
 
 bool               process_record_user(uint16_t keycode, keyrecord_t* record) {
     if (record->event.pressed) {
@@ -158,10 +156,25 @@ bool               process_record_user(uint16_t keycode, keyrecord_t* record) {
             } else { // On key release.
                 unregister_code(registered_key);
             }
-        }
-            return false;
 
-            // Other macros...
+            return false;
+        }
+        case KC_LANG: {
+            if (record->event.pressed) {
+                tap_code16(LGUI(KC_SPACE));
+
+                // TODO: uncomment when stop being a pussy and officially move to colemak
+                /* if (is_qwerty) { */
+                /*     layer_move(COLEMAK); */
+                /* } else { */
+                /*     layer_move(QWERTY); */
+                /* } */
+
+                /* is_qwerty = !is_qwerty; */
+            }
+
+            return false;
+        }
     }
 
     return true;
