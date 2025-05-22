@@ -22,9 +22,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "color.h"
 #include "keycode_string.h"
 #include "keycodes.h"
+#include "quantum.h"
 #include "quantum_keycodes.h"
 #include "rgb_matrix.h"
 #include "caps_word.h"
+#include "wpm.h"
 #include QMK_KEYBOARD_H
 
 // TODO: layer: colemak
@@ -183,6 +185,10 @@ bool oled_task_user(void) {
     // last key press
     oled_write_P(PSTR("Key: "), false);
     oled_write_ln_P(PSTR(last_key_str), false);
+
+    // wpm
+    oled_write_P(PSTR("WPM: "), false);
+    oled_write_ln_P(get_u8_str(get_current_wpm(), ' '), false);
 
     // states
     uint8_t mod_state = get_mods();
