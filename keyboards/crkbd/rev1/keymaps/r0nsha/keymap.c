@@ -20,21 +20,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdbool.h>
 #include "action_layer.h"
 #include "color.h"
+#include "keyboard.h"
 #include "keycode_string.h"
 #include "keycodes.h"
 #include "quantum.h"
 #include "quantum_keycodes.h"
 #include "rgb_matrix.h"
 #include "caps_word.h"
-#include "wpm.h"
 #include QMK_KEYBOARD_H
 
-// TODO: layer: colemak
-// TODO: layer: ext
 // TODO: layer: sym
 // TODO: layer: num
-// TODO: layer: fun
-// TODO: Move QK_BOOT, QK_RBT and EE_CLR to fun layer
 // TODO: layer: gaming
 // TODO: precondition
 // TODO: lang switch button using custom functionality
@@ -45,23 +41,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 enum layers {
     QWERTY,
     COLEMAK,
-    /* EXT, */
+    EXT,
     /* SYM, */
     /* NUM, */
-    /* FUN, */
+    FUN,
     GAMING,
 };
 
 static const hsv_t layer_colors[] = {
-    [QWERTY]  = {HSV_WHITE},
-    [COLEMAK] = {HSV_BLUE},
-    [GAMING]  = {HSV_RED},
+    [QWERTY]  = {HSV_TEAL},
+    [COLEMAK] = {HSV_PINK},
+    [EXT]     = {HSV_CORAL},
+    /* [SYM]     = {HSV_SPRINGGREEN}, */
+    /* [NUM]     = {HSV_ORANGE}, */
+    [FUN]    = {HSV_PURPLE},
+    [GAMING] = {HSV_RED},
 };
 
 static const char* layer_names[] = {
     [QWERTY]  = "QWERTY",
     [COLEMAK] = "COLEMAK",
-    [GAMING]  = "GAMING",
+    [EXT]     = "EXT",
+    /* [SYM]     = "SYM", */
+    /* [NUM]     = "NUM", */
+    [FUN]    = "FUN",
+    [GAMING] = "GAMING",
 };
 
 enum custom_keycodes {
@@ -76,16 +80,16 @@ enum tap_dances {
 };
 
 tap_dance_action_t tap_dance_actions[] = {
-    [TD_COLEMAK] = ACTION_TAP_DANCE_LAYER_TOGGLE(KC_NO, COLEMAK),
-    [TD_GAMING]  = ACTION_TAP_DANCE_LAYER_TOGGLE(KC_NO, GAMING),
+    [TD_COLEMAK] = ACTION_TAP_DANCE_LAYER_TOGGLE(XXXXXXX, COLEMAK),
+    [TD_GAMING]  = ACTION_TAP_DANCE_LAYER_TOGGLE(XXXXXXX, GAMING),
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [QWERTY] = LAYOUT_split_3x6_3(
-        QK_BOOT,        KC_Q,         KC_W,         KC_E,         KC_R,         KC_T,   KC_Y,   KC_U,         KC_I,         KC_O,         KC_P,             QK_BOOT,
-        EE_CLR,         LGUI_T(KC_A), LALT_T(KC_S), LCTL_T(KC_D), LSFT_T(KC_F), KC_G,   KC_H,   RSFT_T(KC_J), RCTL_T(KC_K), LALT_T(KC_L), RGUI_T(KC_QUOTE), RM_NEXT,
-        TD(TD_COLEMAK), KC_Z,         KC_X,         KC_C,         KC_V,         KC_B,   KC_N,   KC_M,         KC_COMM,      KC_DOT,       KC_SLSH,          TD(TD_GAMING),
-                                                    KC_ESC,       KC_SPC,       KC_TAB, KC_ENT, KC_BSPC,      KC_TAB
+        XXXXXXX,        KC_Q,         KC_W,         KC_E,         KC_R,         KC_T,   KC_Y,            KC_U,         KC_I,         KC_O,         KC_P,             XXXXXXX,
+        XXXXXXX,        LGUI_T(KC_A), LALT_T(KC_S), LCTL_T(KC_D), LSFT_T(KC_F), KC_G,   KC_H,            RSFT_T(KC_J), RCTL_T(KC_K), LALT_T(KC_L), RGUI_T(KC_QUOTE), XXXXXXX,
+        TD(TD_COLEMAK), KC_Z,         KC_X,         KC_C,         KC_V,         KC_B,   KC_N,            KC_M,         KC_COMM,      KC_DOT,       KC_SLSH,          TD(TD_GAMING),
+                                                    KC_ESC,       KC_SPC,       KC_TAB, LT(EXT, KC_ENT), KC_BSPC,      MO(FUN)
     ),
 
     [COLEMAK] = LAYOUT_split_3x6_3(
@@ -93,6 +97,20 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______, KC_A, KC_R, KC_S,    KC_T,    KC_G,    KC_M,    KC_N,    KC_E,    KC_I,   KC_O,    _______,
         _______, KC_Z, KC_X, KC_C,    KC_D,    KC_V,    KC_K,    KC_H,    KC_COMM, KC_DOT, KC_SLSH, _______,
                              _______, _______, _______, _______, _______, _______
+    ),
+
+    [EXT] = LAYOUT_split_3x6_3(
+        XXXXXXX, XXXXXXX,       XXXXXXX,       XXXXXXX,       XXXXXXX,       XXXXXXX, KC_HOME, KC_PGDN, KC_PGUP, KC_END,  KC_ESC, XXXXXXX,
+        XXXXXXX, LGUI(XXXXXXX), LALT(XXXXXXX), LCTL(XXXXXXX), LSFT(XXXXXXX), XXXXXXX, KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, KC_ENT, XXXXXXX,
+        XXXXXXX, XXXXXXX,       XXXXXXX,       XXXXXXX,       CW_TOGG,       KC_LANG, XXXXXXX, KC_DEL,  KC_INS,  XXXXXXX, KC_TAB, XXXXXXX,
+                                               _______,       _______,       _______, _______, _______, _______
+    ),
+
+    [FUN] = LAYOUT_split_3x6_3(
+        RM_TOGG, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_F12,  KC_F7,   KC_F8,  KC_F9, XXXXXXX, QK_BOOT,
+        RM_NEXT, KC_MSTP, KC_MPRV, KC_MPLY, KC_MNXT, KC_BRIU, KC_F11,  KC_F4,   KC_F5,  KC_F6, XXXXXXX, QK_RBT,
+        RM_PREV, KC_PSCR, KC_VOLD, KC_MUTE, KC_VOLU, KC_BRID, KC_F10,  KC_F1,   KC_F2,  KC_F3, XXXXXXX, EE_CLR,
+                                   _______, _______, _______, _______, _______, _______
     ),
 
     [GAMING] = LAYOUT_split_3x6_3(
@@ -149,7 +167,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
 }
 
 void keyboard_post_init_user(void) {
-    rgb_matrix_mode(RGB_MATRIX_SOLID_COLOR);
+    rgb_matrix_mode(RGB_MATRIX_RIVERFLOW);
+    hsv_t default_layer_color = layer_colors[QWERTY];
+    rgb_matrix_sethsv(default_layer_color.h, default_layer_color.s, default_layer_color.v);
 }
 
 layer_state_t default_layer_set_user(layer_state_t state) {
@@ -169,10 +189,14 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 }
 
 #ifdef OLED_ENABLE
-bool oled_task_user(void) {
+void oled_render_logo(void) {
+    static const char PROGMEM crkbd_logo[] = {0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f, 0x90, 0x91, 0x92, 0x93, 0x94, 0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf, 0xb0, 0xb1, 0xb2, 0xb3, 0xb4, 0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf, 0xd0, 0xd1, 0xd2, 0xd3, 0xd4, 0};
+    oled_write_P(crkbd_logo, false);
+}
+
+void oled_render_layer(void) {
     uint8_t layer = get_highest_layer(layer_state);
 
-    // current layer
     oled_write_P(PSTR("Layer: "), false);
 
     const char* layer_name = "Unknown";
@@ -181,23 +205,31 @@ bool oled_task_user(void) {
     }
 
     oled_write_ln_P(PSTR(layer_name), false);
+}
 
-    // last key press
+void oled_render_key(void) {
     oled_write_P(PSTR("Key: "), false);
     oled_write_ln_P(PSTR(last_key_str), false);
+}
 
-    // wpm
-    oled_write_P(PSTR("WPM: "), false);
-    oled_write_ln_P(get_u8_str(get_current_wpm(), ' '), false);
-
-    // states
-    uint8_t mod_state = get_mods();
+void oled_render_mods(void) {
+    uint8_t mods = get_mods();
     oled_write(is_caps_word_on() ? "CAPW " : "      ", false);
-    oled_write((mod_state & MOD_MASK_SHIFT) ? "SHIFT " : "      ", false);
-    oled_write((mod_state & MOD_MASK_CTRL) ? "CTRL " : "     ", false);
-    oled_write((mod_state & MOD_MASK_ALT) ? "ALT " : "    ", false);
-    oled_write((mod_state & MOD_MASK_GUI) ? "GUI" : "   ", false);
+    oled_write((mods & MOD_MASK_SHIFT) ? "SHIFT " : "      ", false);
+    oled_write((mods & MOD_MASK_CTRL) ? "CTRL " : "     ", false);
+    oled_write((mods & MOD_MASK_ALT) ? "ALT " : "    ", false);
+    oled_write((mods & MOD_MASK_GUI) ? "GUI" : "   ", false);
     oled_write("\n", false);
+}
+
+bool oled_task_user(void) {
+    if (is_keyboard_master()) {
+        oled_render_layer();
+        oled_render_key();
+        oled_render_mods();
+    } else {
+        oled_render_logo();
+    }
 
     return false;
 }
