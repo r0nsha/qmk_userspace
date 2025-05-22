@@ -32,8 +32,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "rgb_matrix.h"
 #include QMK_KEYBOARD_H
 
-// TODO: precondition
-
 enum layers {
     QWERTY,
     COLEMAK,
@@ -98,10 +96,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 
     [NUM] = LAYOUT_split_3x6_3(
-        _______, XXXXXXX,       XXXXXXX,       XXXXXXX,       XXXXXXX,       XXXXXXX, KC_ASTR, KC_7,    KC_8, KC_9, KC_PLUS, _______,
-        _______, LGUI(XXXXXXX), LALT(XXXXXXX), LCTL(XXXXXXX), LSFT(XXXXXXX), KC_EQL,  KC_SLSH, KC_4,    KC_5, KC_6, KC_MINS, _______,
-        _______, XXXXXXX,       XXXXXXX,       XXXXXXX,       XXXXXXX,       XXXXXXX, XXXXXXX, KC_1,    KC_2, KC_3, KC_DOT,  _______,
-                                               _______,       _______,       _______, _______, _______, KC_0
+        _______, XXXXXXX,       XXXXXXX,       XXXXXXX,       XXXXXXX,       XXXXXXX, KC_ASTR, KC_7, KC_8, KC_9, KC_PLUS, _______,
+        _______, LGUI(XXXXXXX), LALT(XXXXXXX), LCTL(XXXXXXX), LSFT(XXXXXXX), KC_EQL,  KC_SLSH, KC_4, KC_5, KC_6, KC_MINS, _______,
+        _______, XXXXXXX,       XXXXXXX,       XXXXXXX,       XXXXXXX,       XXXXXXX, XXXXXXX, KC_1, KC_2, KC_3, KC_DOT,  _______,
+                                               _______,       _______,       _______, _______, KC_0, KC_0
     ),
 
     [FUN] = LAYOUT_split_3x6_3(
