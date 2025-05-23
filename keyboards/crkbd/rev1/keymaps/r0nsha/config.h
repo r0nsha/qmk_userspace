@@ -26,7 +26,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define TAPPING_TERM 200
 #define QUICK_TAP_TERM 120
-#define PERMISSIVE_HOLD
+#undef HOLD_ON_OTHER_KEY_PRESS
+#undef PERMISSIVE_HOLD
 #define TAPPING_TOGGLE 2
 
 #ifdef RGB_MATRIX_ENABLE
