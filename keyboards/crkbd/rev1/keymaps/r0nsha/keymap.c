@@ -235,11 +235,11 @@ void oled_render_mods(void) {
 
 bool oled_task_user(void) {
     if (is_keyboard_master()) {
+        oled_render_logo();
+    } else {
         oled_render_layer();
         oled_render_key();
         oled_render_mods();
-    } else {
-        oled_render_logo();
     }
 
     return false;
