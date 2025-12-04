@@ -24,7 +24,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "caps_word.h"
 #include "color.h"
 #include "keyboard.h"
-#include "keycode_string.h"
 #include "keycodes.h"
 #include "keymap_us.h"
 #include "quantum.h"
@@ -43,10 +42,10 @@ enum layers {
 };
 
 static const hsv_t layer_colors[] = {
-    [QWERTY] = {HSV_SPRINGGREEN}, [COLEMAK] = {HSV_MAGENTA}, [GAMING] = {HSV_RED}, [EXT] = {HSV_PINK}, [SYM] = {HSV_ORANGE}, [NUM] = {HSV_BLUE}, [FUN] = {HSV_PURPLE},
+    [QWERTY] = {HSV_ORANGE}, [COLEMAK] = {HSV_MAGENTA}, [GAMING] = {HSV_RED}, [EXT] = {HSV_PINK}, [SYM] = {HSV_SPRINGGREEN}, [NUM] = {HSV_BLUE}, [FUN] = {HSV_PURPLE},
 };
 
-static const char* layer_names[] = {
+static const char *layer_names[] = {
     [QWERTY] = "QWERTY", [COLEMAK] = "COLEMAK", [GAMING] = "GAMING", [EXT] = "EXT", [SYM] = "SYM", [NUM] = "NUM", [FUN] = "FUN",
 };
 
@@ -117,10 +116,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 };
 
-static const char* last_key_str = "None";
+static const char *last_key_str = "None";
 bool               is_qwerty    = true;
 
-bool               process_record_user(uint16_t keycode, keyrecord_t* record) {
+bool               process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (record->event.pressed) {
         last_key_str = get_keycode_string(keycode);
     }
@@ -211,7 +210,7 @@ void oled_render_layer(void) {
 
     oled_write_P(PSTR("Layer: "), false);
 
-    const char* layer_name = "Unknown";
+    const char *layer_name = "Unknown";
     if (layer < sizeof(layer_names) / sizeof(layer_names[0])) {
         layer_name = layer_names[layer];
     }
