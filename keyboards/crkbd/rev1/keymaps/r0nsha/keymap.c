@@ -115,7 +115,25 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 static const char *last_key_str = "None";
 bool               is_qwerty    = true;
 
-bool               process_record_keymap(uint16_t keycode, keyrecord_t *record) {
+bool               is_flow_tap_key(uint16_t keycode) {
+    if ((get_mods() & (MOD_MASK_CG | MOD_BIT_LALT | MOD_MASK_SHIFT)) != 0) {
+        return false; // disable flow tap on hotkeys.
+    }
+
+    switch (keycode) {
+        case KC_SPC:
+        case KC_A ... KC_Z:
+        case KC_DOT:
+        case KC_COMM:
+        case KC_SCLN:
+        case KC_SLSH:
+            return true;
+    }
+
+    return false;
+}
+
+bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
     if (record->event.pressed) {
         last_key_str = get_keycode_string(keycode);
     }
